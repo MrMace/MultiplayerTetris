@@ -24,7 +24,19 @@ matrix.forEach((row, y) => {
 });
 }
 
-function update() {
+let dropCounter = 0;
+let dropInterval = 1000;
+
+let lastTime = 0;
+function update(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+
+    dropCounter += deltaTime;
+    if(dropCounter > dropInterval){
+        player.pos.y++;
+        dropCounter = 0;
+    }
     draw();
     requestAnimationFrame(update);
 }
@@ -40,5 +52,14 @@ function draw(){
 drawMatrix(player.matrix, player.pos);
 }
 
+document.addEventListener('keydown', event => {
+    // console.log(event);
+
+    if(event.keyCode === 37){
+        player.pos.x--;
+}else if(event.keyCode === 39){
+        player.pos.x++;
+}
+})
 
 update();
