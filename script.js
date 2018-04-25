@@ -41,6 +41,11 @@ let lastTime = 0;
 
 function playerDrop() {
     player.pos.y++;
+    if(collide(arena, player)){
+        player.pos.y--;
+        merge(arena, player);
+        player.pos.y = 0;
+    }
     dropCounter = 0;
 }
 
