@@ -14,16 +14,14 @@ const matrix = [
 
 const colors = [
     null,
-    'red',
-    'blue',
-    'purple',
-    'green',
-    'yellow',
-    'orange',
-    'violet',
-    'pink',
-    'gold',
-    'white'
+    '#FBF0B2',
+    '#FBCC9E',
+    '#FA8E89',
+    '#31A3B2',
+    '#4AD99A',
+    '#766483',
+    '#8BFC87'
+
 ]
 
 function collide(arena, player) {
@@ -64,8 +62,10 @@ function playerDrop() {
     if (collide(arena, player)) {
         player.pos.y--;
         merge(arena, player);
-        playerReset()
+        playerReset();
         // player.pos.y = 0;
+        lineSweep();
+        updateScore();
     }
     dropCounter = 0;
 }
@@ -128,6 +128,24 @@ function merge(arena, player) {
     ;
 }
 
+function lineSweep() {
+    let rowCount = 1;
+    outer: for(let y = arena.length - 1; y > 0; --y ){
+        for (let x = 0; x < arena[y].length; ++x){
+            if(arena[y][x]===0){
+                continue outer;
+            }
+        }
+
+        const row = arena.splice(y,1)[0].fill(0);
+        arena.unshift(row);
+        ++y;
+
+        player.score += rowCount * 10;
+        rowCount *= 2;
+    }
+}
+
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
@@ -140,11 +158,16 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
+function updateScore(){
+    document.getElementById('score').innerText = player.score;
+}
+
 const arena = createMatrix(12, 20);
 
 const player = {
-    pos: {x: 5, y: 5},
-    matrix: createBlock('T'),
+    pos: {x: 0, y: 0},
+    matrix: null,
+    score: 0,
 };
 
 function createBlock(type) {
@@ -201,6 +224,8 @@ function playerReset(){
 
     if(collide(arena, player)){
         arena.forEach(row => row.fill(0));
+        player.score = 0;
+        updateScore();
     }
 }
 
@@ -213,7 +238,7 @@ function createMatrix(w, h) {
 }
 
 function draw() {
-    context.fillStyle = '#000';
+    context.fillStyle = '#242424';
     context.fillRect(0, 0, canvas.width, canvas.height);
     drawMatrix(arena, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
@@ -243,4 +268,6 @@ if (event.keyCode === 39) {
 
 })
 
+playerReset();
+updateScore();
 update();
